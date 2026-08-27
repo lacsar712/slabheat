@@ -1,6 +1,6 @@
-# HookRelay
+# slabheat
 
-Signed ingress + reliable outbound webhook delivery (retry, circuit breaker, rate limit, DLQ, replay).
+slabheat 是一套板坯加热炉工业过程控制系统，用于燃烧支路、均热段温区与 Web HMI 联锁。
 
 ## Requirements
 
