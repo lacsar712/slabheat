@@ -73,8 +73,11 @@ func (a *App) RunGasfuelRamp(ctx context.Context, holder string, targetTPH float
 
 func (a *App) RunCoalFeed(ctx context.Context, holder string, steps int) error {
 	defer a.cancelGasfuelLoop(holder)
-	_ = a.bindGasfuelLoop(holder, ctx)
+	loopCtx := a.bindGasfuelLoop(holder, ctx)
 	for i := 0; steps <= 0 || i < steps; i++ {
+		if err := loopCtx.Err(); err != nil {
+			return fmt.Errorf("%w", model.ErrContextDone)
+		}
 		snap := a.Snapshot()
 		comb := snap.Burner
 		comb.GasfuelFlowTPH += 0.5
