@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/lacsar712/slabheat/internal/model"
 )
 

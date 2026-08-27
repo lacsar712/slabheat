@@ -9,7 +9,7 @@ var CalibrateProbe func(ctx context.Context) error
 
 func (a *App) Calibrate(ctx context.Context, holder string) error {
 	now := a.clk.Now()
-	lease, err := a.interlock.Leases().Acquire(a.cfg.UnitID, holder, now)
+	_, err := a.interlock.Leases().Acquire(a.cfg.UnitID, holder, now)
 	if err != nil {
 		return err
 	}
