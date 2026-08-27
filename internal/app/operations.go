@@ -180,7 +180,13 @@ func (a *App) Shutdown(ctx context.Context, holder string) error {
 	now := a.clk.Now()
 	return a.interlock.Leases().WithLease(ctx, a.cfg.UnitID, holder, now, func(ctx context.Context) error {
 		a.StopTickLoop()
-		a.cancelGasfuelLoop(holder)
+		// A plant-wide shutdown must quench every combustion-opening ramp, not
+		// only the one registered under this shutdown's holder. A ramp started
+		// by auto load-follow or another operator is keyed under a different
+		// holder, so a holder-scoped cancel would silently miss it and the
+		// opening would keep creeping (flue quiet, slab surface temp rising)
+		// after the shutdown command has already landed.
+		a.cancelAllGasfuelLoops()
 		state, err := a.fsm.Dispatch(ctx, fsm.EvShutdown)
 		if err != nil {
 			return err
