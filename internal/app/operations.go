@@ -180,9 +180,12 @@ func (a *App) Shutdown(ctx context.Context, holder string) error {
 	now := a.clk.Now()
 	return a.interlock.Leases().WithLease(ctx, a.cfg.UnitID, holder, now, func(ctx context.Context) error {
 		a.StopTickLoop()
-		// 停炉口令须掐灭所有仍在顶开度的燃烧支路 ramp：ramp 可能由其它 holder
-		// （自动协调/二号区支路程序）启动，按本 holder 取消碰不到，会留下一个
-		// 继续抬高 GasfuelFlowTPH 的 goroutine，导致停炉后开度仍蹭高、板温续抬。
+		// Shutdown must quash every live gasfuel ramp, not only the one bound
+		// to this holder: a ramp started by an automated/coordination holder
+		// under a different key would otherwise keep incrementing the
+		// combustion-branch opening (GasfuelFlowTPH) after the tick loop
+		// (airflow/draft) is already stopped, so the stopped opening keeps
+		// climbing and reheating the slab surface.
 		a.cancelAllGasfuelLoops()
 		state, err := a.fsm.Dispatch(ctx, fsm.EvShutdown)
 		if err != nil {
