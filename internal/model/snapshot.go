@@ -3,7 +3,9 @@ package model
 import "time"
 
 func CloneSnapshot(s PlantSnapshot) PlantSnapshot {
-	return s
+	out := s
+	out.Alarms = append([]AlarmEvent(nil), s.Alarms...)
+	return out
 }
 
 func DefaultSnapshot(unitID string) PlantSnapshot {
