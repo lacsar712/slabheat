@@ -34,7 +34,7 @@ func (p *PermissiveSet) AllFiring() bool {
 
 func (p *PermissiveSet) CheckIgnition() error {
 	if !p.gasfuelOK {
-		return fmt.Errorf("%w", model.ErrGasfuelPermissive)
+		return model.PermissiveChain("ignition")
 	}
 	if !p.ignitionOK {
 		return fmt.Errorf("%w", model.ErrIgnitionBlocked)

@@ -8,7 +8,7 @@ import (
 
 func (a *App) CheckSlabskidLevel(snap model.PlantSnapshot) error {
 	if snap.Slabskid.LevelPercent < model.MinSlabskidLevelPercent {
-		return fmt.Errorf("%w", model.ErrSlabskidLevelLow)
+		return model.LevelChain(snap.Slabskid.LevelPercent)
 	}
 	return nil
 }

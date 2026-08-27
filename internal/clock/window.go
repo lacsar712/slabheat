@@ -39,7 +39,7 @@ func NewPreheatWindow(clk ProcessClock) *PreheatWindow {
 }
 
 func (p *PreheatWindow) Ready(startedAt time.Time) bool {
-	return p.window.Satisfied(p.clk, startedAt)
+	return ProcessSpanOpen(p.clk, startedAt, p.window.Duration)
 }
 
 func (p *PreheatWindow) Require(startedAt time.Time) error {
@@ -99,7 +99,7 @@ func NewBurnerWarmupWindow(clk ProcessClock) *BurnerWarmupWindow {
 }
 
 func (c *BurnerWarmupWindow) Ready(ignitionAt time.Time) bool {
-	return c.window.Satisfied(c.clk, ignitionAt)
+	return ProcessSpanOpen(c.clk, ignitionAt, c.window.Duration)
 }
 
 func (c *BurnerWarmupWindow) Require(ignitionAt time.Time) error {

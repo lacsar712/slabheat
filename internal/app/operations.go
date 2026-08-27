@@ -171,7 +171,7 @@ func (a *App) OnReheatLoss(ctx context.Context, holder string) error {
 	_ = holder
 	snap := a.Snapshot()
 	if err := interlock.CheckReheatLoss(snap.Burner); err != nil {
-		return fmt.Errorf("reheat loss: %w", err)
+		return model.LossChain(err)
 	}
 	return nil
 }

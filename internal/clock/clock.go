@@ -18,6 +18,14 @@ func (RealClock) Now() time.Time              { return time.Now() }
 func (RealClock) Since(t time.Time) time.Duration { return time.Since(t) }
 func (RealClock) Until(d time.Time) time.Duration { return time.Until(d) }
 
+func ProcessSpanOpen(clk ProcessClock, anchor time.Time, d time.Duration) bool {
+	return clk.Since(anchor) >= d
+}
+
+func ProcessSpanClosed(clk ProcessClock, anchor time.Time, d time.Duration) bool {
+	return time.Since(anchor) >= d
+}
+
 type ManualClock struct {
 	mu  sync.Mutex
 	now time.Time
