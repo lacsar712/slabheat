@@ -180,12 +180,15 @@ func (a *App) Shutdown(ctx context.Context, holder string) error {
 	now := a.clk.Now()
 	return a.interlock.Leases().WithLease(ctx, a.cfg.UnitID, holder, now, func(ctx context.Context) error {
 		a.StopTickLoop()
-		// Shutdown must quash every live gasfuel ramp, not only the one bound
-		// to this holder: a ramp started by an automated/coordination holder
-		// under a different key would otherwise keep incrementing the
-		// combustion-branch opening (GasfuelFlowTPH) after the tick loop
-		// (airflow/draft) is already stopped, so the stopped opening keeps
-		// climbing and reheating the slab surface.
+		// A whole-row shutdown must tear down every gasfuel ramp loop,
+		// not just the one bound to this command's holder. Ramp loops
+		// (RunGasfuelRamp/RunCoalFeed) are registered under whichever
+		// holder started them, which is frequently a different operator
+		// or automation holder than the one issuing the shutdown.
+		// Cancelling only by this holder leaves those loops alive, so
+		// GasfuelFlowTPH keeps creeping up while the tick loop (and thus
+		// AirflowTPH / flue-gas suction) is frozen -- the burner branch
+		// keeps pushing opening after the stop command has landed.
 		a.cancelAllGasfuelLoops()
 		state, err := a.fsm.Dispatch(ctx, fsm.EvShutdown)
 		if err != nil {
